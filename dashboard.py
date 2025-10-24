@@ -12,11 +12,12 @@ from Sidebar import show_sidebar_menu
 from features.WoChart import render_wochart
 from features.StatusChart import render_statuschart
 from features.Sla import render_slasum
+from features.StatusInfo import render_guide
 # from features.ExportSla import exportsla  
 # from features.merge_files import render_merge_files
 
 
-st.set_page_config(layout="wide", page_title="FIELDSA DASHBOARD")
+st.set_page_config(layout="wide", page_title="FIELDSA DASHBOARD UP")
 with open("header.html", "r") as head:
     st.markdown(head.read(), unsafe_allow_html=True)
 
@@ -98,6 +99,9 @@ if uploaded is not None:
 
         elif menu_sidebar == "SLA Summary":
             render_slasum(df, exceldata)
+             
+        elif menu_sidebar == "Status Information":
+            render_guide(df)
         
         # elif menu_sidebar == "Export SLA":
         #     exportsla(df)

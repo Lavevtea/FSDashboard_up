@@ -12,6 +12,8 @@ def show_sidebar_menu(df, uploaded):
         st.session_state.menu_sidebar = "SLA Summary"
     if st.sidebar.button("Export SLA"):
         st.session_state.menu_sidebar = "Export SLA"
+    if st.sidebar.button("Status Information"):
+        st.session_state.menu_sidebar = "Status Information"
     # if st.sidebar.button("Data Comparation"):
     #     st.session_state.menu_sidebar = "Data Comparation"
     # if st.sidebar.button("Merge Files"):
