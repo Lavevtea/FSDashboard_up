@@ -63,19 +63,45 @@ def render_guide(df):
         },
     }
 
-    # Build markdown table
-    header = "| Keterangan | " + " | ".join(table.keys()) + " |"
-    separator = "|" + "-------------|" * (len(table) + 1)
+    html = """
+    <style>
+        table.guide-table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        table.guide-table th, table.guide-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            vertical-align: middle;
+        }
+        table.guide-table th {
+            background-color: #f37336; 
+            color: white;
+            text-align: center;
+        }
+        table.guide-table td {
+            background-color: #F9F9F9;
+        }
+    </style>
+    <table class="guide-table">
+        <tr>
+            <th>Keterangan</th>
+    """
 
-    pengertian_row = "| **Pengertian** | " + " | ".join(
-        [table[k]["Pengertian"] for k in table]
-    ) + " |"
+    for key in table.keys():
+        html += f"<th>{key}</th>"
+    html += "</tr>"
 
-    status_row = "| **Status Fieldsa** | " + " | ".join(
-        ["<br>".join(table[k]["Status Fieldsa"]) for k in table]
-    ) + " |"
+    html += "<tr><td><b>Pengertian</b></td>"
+    for key in table.keys():
+        html += f"<td>{table[key]['Pengertian']}</td>"
+    html += "</tr>"
 
-    table_render = f"{header}\n{separator}\n{pengertian_row}\n{status_row}"
+    html += "<tr><td><b>Status Fieldsa</b></td>"
+    for key in table.keys():
+        status_list = "<br>".join(table[key]["Status Fieldsa"])
+        html += f"<td>{status_list}</td>"
+    html += "</tr></table>"
 
-    st.markdown(table_render, unsafe_allow_html=True)
+    st.markdown(html, unsafe_allow_html=True)
 

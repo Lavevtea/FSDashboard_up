@@ -260,10 +260,12 @@ def render_statuschart(dfstat,exceldata):
                                 return "4-6 Jam"
                             elif hour<=12:
                                 return "6-12 Jam"
+                            elif hour<=24:
+                                return "12-24 Jam"
                             elif pd.isna(hour):
                                 return None
                             else:
-                                return ">12 Jam"
+                                return ">24 Jam"
                         def slaoptions_broadband(hour):
                             if hour<=6:
                                 return "0-6 Jam"
@@ -279,7 +281,7 @@ def render_statuschart(dfstat,exceldata):
                             urutansla= ["0-6 Jam", "6-12 Jam", "12-24 Jam", ">24 Jam"]
                         else:
                             tergabung["slaoptions"]= tergabung["duration"].apply(slaoptions_general)
-                            urutansla= ["0-4 Jam", "4-6 Jam", "6-12 Jam", ">12 Jam"]
+                            urutansla= ["0-4 Jam", "4-6 Jam", "6-12 Jam","12-24 Jam", ">24 Jam"]
                         priority_cols = [
                             ("Region", selectedregion),
                             ("SubRegion", selectedsubregion),
@@ -421,13 +423,22 @@ def render_statuschart(dfstat,exceldata):
                                                     elif colname[1] == "POSTPONE":
                                                         styles[i] = "background-color: orange"
                                                         
-                                                elif sla == ">12 Jam":
+                                                elif sla == "12-24 Jam":
                                                     if colname[1] == "OPEN":
                                                         styles[i] = "background-color: red"
                                                     elif colname[1] == "ONPROGRESS":
                                                         styles[i] = "background-color: red"
                                                     elif colname[1] == "POSTPONE":
                                                         styles[i] = "background-color: red"
+                                                        
+                                                elif sla == ">24 Jam":
+                                                    if colname[1] == "OPEN":
+                                                        styles[i] = "background-color: red"
+                                                    elif colname[1] == "ONPROGRESS":
+                                                        styles[i] = "background-color: red"
+                                                    elif colname[1] == "POSTPONE":
+                                                        styles[i] = "background-color: red"
+                                                        
                                             elif "Broadband" in divisi:
                                                 if sla == "12-24 Jam":
                                                     if colname[1] == "OPEN":
