@@ -1,70 +1,81 @@
-import streamlit as st 
+import streamlit as st
+import pandas as pd
 
 def render_guide(df):
-    
-    st.write("## Status Information") 
-    col1, col2, col3, col4, col5, col6 = st.columns(6)
-    with col1:
-        st.write("""
-            ### ONPROGRESS  
-            **Durasi ini dihitung mulai dari waktu terakhir WO berada pada salah satu status di bawah hingga waktu saat ini (real-time)**  
-            - Assign To Technician  
-            - Accept  
-            - Travel  
-            - Arrive  
-            - On Progress  
-            - Return  
-            - Assign To Dispatch External  
-            - Complete With Note Reject  
-            - Revise  
-            - Return By Technician  
-            - Return Is Revised  
-            - Provisioning In Progress  
-            - Provisioning Success  
-        """)
-    
-    with col2:
-        st.write("""
-            ### COMPLETE  
-            **Durasi kategori ini dihitung dari saat WO dibuka (status “Open”) hingga WO dinyatakan selesai. Status yang termasuk dalam kategori ini antara lain:**  
-            - Complete With Note Approve  
-            - Complete  
-            - Done  
-            - Work Order Confirmation Approve  
-            - Posted To Ax Integration Success  
-        """)
-    
-    with col3:
-        st.write("""
-            ### POSTPONE  
-            **Mencakup WO yang direschedule, dengan status sebagai berikut:**  
-            - Postpone  
-            - Postpone Is Revised  
-        """)
-    
-    with col4:
-        st.write("""
-            ### INTEGRATION FAILED
-            **Mencakup WO yang gagal diproses karena kendala pada proses integrasi sistem. Status yang termasuk di antaranya:**  
-            - Sms Integration Failed  
-            - Posted To Ax Integration Failed  
-            - Provisioning Failed  
-        """)
-    
-    with col5:
-        st.write("""
-            ### APPROVAL DISPATCHER FS  
-            **Mencakup WO yang sedang menunggu persetujuan dari Dispatcher FS, dengan status berikut:**  
-            - Complete With Note Request  
-            - Postpone Request  
-        """)
-    
-    with col6:
-        st.write("""
-            ### CANCEL  
-            **Mencakup WO yang telah dibatalkan, dengan status:**  
-            - Cancel Work Order  
-        """)
+    st.write("## Status Information")
 
+    table = {
+        "ONPROGRESS": {
+            "Pengertian": "Durasi WO yang dihitung mulai dari waktu terakhir WO berada pada salah satu status di bawah hingga waktu saat ini (real-time)",
+            "Status Fieldsa": [
+                "1. Assign To Technician",
+                "2. Accept",
+                "3. Travel",
+                "4. Arrive",
+                "5. On Progress",
+                "6. Return",
+                "7. Assign To Dispatch External",
+                "8. Complete With Note Reject",
+                "9. Revise",
+                "10. Return By Technician",
+                "11. Return Is Revised",
+                "12. Provisioning In Progress",
+                "13. Provisioning Success"
+            ]
+        },
+        "COMPLETE": {
+            "Pengertian": "Durasi WO yang dihitung dari saat WO dibuka (status 'Open') hingga WO dinyatakan selesai",
+            "Status Fieldsa": [
+                "1. Complete With Note Approve",
+                "2. Complete",
+                "3. Done",
+                "4. Work Order Confirmation Approve",
+                "5. Posted To Ax Integration Success"
+            ]
+        },
+        "POSTPONE": {
+            "Pengertian": "Mencakup WO yang direschedule",
+            "Status Fieldsa": [
+                "1. Postpone",
+                "2. Postpone Is Revised"
+            ]
+        },
+        "INTEGRATION FAILED": {
+            "Pengertian": "Mencakup WO yang gagal diproses karena kendala pada proses integrasi sistem",
+            "Status Fieldsa": [
+                "1. Sms Integration Failed",
+                "2. Posted To Ax Integration Failed",
+                "3. Provisioning Failed"
+            ]
+        },
+        "APPROVAL DISPATCHER FS": {
+            "Pengertian": "Mencakup WO yang sedang menunggu persetujuan dari Dispatcher FS",
+            "Status Fieldsa": [
+                "1. Complete With Note Request",
+                "2. Postpone Request"
+            ]
+        },
+        "CANCEL": {
+            "Pengertian": "Mencakup WO yang telah dibatalkan",
+            "Status Fieldsa": [
+                "1. Cancel Work Order"
+            ]
+        },
+    }
 
-# status: ISI DR OPEN ONGOING DLL, DAN WAKTUNYA DIAMBIL DR KAPAN SAMPAI KAPAN. integration failed. approval dispatcher 
+    # Build markdown table
+    header = "| Keterangan | " + " | ".join(table.keys()) + " |"
+    separator = "|" + "-------------|" * (len(table) + 1)
+
+    pengertian_row = "| **Pengertian** | " + " | ".join(
+        [table[k]["Pengertian"] for k in table]
+    ) + " |"
+
+    status_row = "| **Status Fieldsa** | " + " | ".join(
+        ["<br>".join(table[k]["Status Fieldsa"]) for k in table]
+    ) + " |"
+
+    table_render = f"{header}\n{separator}\n{pengertian_row}\n{status_row}"
+
+    st.markdown(table_render, unsafe_allow_html=True)
+

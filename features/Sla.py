@@ -425,29 +425,68 @@ def render_slasum(df,exceldata):
                             #             "APPROVAL DISPATCHER FS",
                             #             "CANCEL"}
                         
-                        
-                        region, subregion, city,  vendor2= st.tabs(["Region","Sub Region", "City",  "Vendor Pivot"])
+    
+                        region, subregion, city,  vendor= st.tabs(["Region","Sub Region", "City",  "Vendor"])
                         with region:
                             rendersla("SLA Summary per Region", finaltabel_region, kol_area="Region",height=500)
+                            for region in sorted(tergabung_valid["Region"].dropna().unique()):
+                                with st.expander(f"{region}"):
+                                    region_df= tergabung_valid[tergabung_valid["Region"]== region]
+                                    # st.write(region_df)
+                                    status_sum=(
+                                        region_df.groupby("StatusReport")["WorkOrderNumber"].nunique().reindex(["OPEN", "ONPROGRESS", "POSTPONE", "COMPLETE", "INTEGRATION FAILED", "APPROVAL DISPATCHER FS", "CANCEL"], fill_value=0).reset_index()
+                                    )
+                                    for m, row in status_sum.iterrows():
+                                        status= row["StatusReport"]
+                                        count= row["WorkOrderNumber"]
+                                        if count>0:
+                                            with st.expander(f"{status} ({count} WO)"):
+                                                filtered= region_df[region_df["StatusReport"]== status]
+                                                addinfo_fromdf= df[["WorkOrderNumber", "ReferenceCode", "VendorName"]].drop_duplicates()
+                                                wo_info= pd.merge(filtered,addinfo_fromdf, on="WorkOrderNumber", how="left")
+                                                wo_info= wo_info[[ "WorkOrderNumber","ReferenceCode", "City", "VendorName"]]
+                                                st.dataframe(wo_info, hide_index=True, width="stretch")
+                                
                         with subregion:
                             rendersla("SLA Summary per SubRegion", finaltabel_subregion, kol_area="SubRegion", height=500)
+                            for subregion in sorted(tergabung_valid["SubRegion"].dropna().unique()):
+                                with st.expander(f"{subregion}"):
+                                    subregion_df= tergabung_valid[tergabung_valid["SubRegion"]== subregion]
+                                    status_sum=(
+                                        subregion_df.groupby("StatusReport")["WorkOrderNumber"].nunique().reindex(["OPEN", "ONPROGRESS", "POSTPONE", "COMPLETE", "INTEGRATION FAILED", "APPROVAL DISPATCHER FS", "CANCEL"], fill_value=0).reset_index()
+                                    )
+                                    for m, row in status_sum.iterrows():
+                                        status= row["StatusReport"]
+                                        count= row["WorkOrderNumber"]
+                                        if count>0:
+                                            with st.expander(f"{status} ({count} WO)"):
+                                                filtered= subregion_df[subregion_df["StatusReport"]== status]
+                                                addinfo_fromdf= df[["WorkOrderNumber", "ReferenceCode", "VendorName"]].drop_duplicates()
+                                                wo_info= pd.merge(filtered,addinfo_fromdf, on="WorkOrderNumber", how="left")
+                                                wo_info= wo_info[[ "WorkOrderNumber","ReferenceCode", "City", "VendorName"]]
+                                                st.dataframe(wo_info, hide_index=True, width="stretch")
                         with city:
                             rendersla("SLA Summary per City", finaltabel_city, kol_area="City", height=500) 
+                            for city in sorted(tergabung_valid["City"].dropna().unique()):
+                                with st.expander(f"{city}"):
+                                    city_df= tergabung_valid[tergabung_valid["City"]== city]
+                                    status_sum=(
+                                        city_df.groupby("StatusReport")["WorkOrderNumber"].nunique().reindex(["OPEN", "ONPROGRESS", "POSTPONE", "COMPLETE", "INTEGRATION FAILED", "APPROVAL DISPATCHER FS", "CANCEL"], fill_value=0).reset_index()
+                                    )
+                                    for m, row in status_sum.iterrows():
+                                        status= row["StatusReport"]
+                                        count= row["WorkOrderNumber"]
+                                        if count>0:
+                                            with st.expander(f"{status} ({count} WO)"):
+                                                filtered= city_df[city_df["StatusReport"]== status]
+                                                addinfo_fromdf= df[["WorkOrderNumber", "ReferenceCode", "VendorName"]].drop_duplicates()
+                                                wo_info= pd.merge(filtered,addinfo_fromdf, on="WorkOrderNumber", how="left")
+                                                wo_info= wo_info[[ "WorkOrderNumber","ReferenceCode", "City", "VendorName"]]
+                                                st.dataframe(wo_info, hide_index=True, width="stretch")
                     
-                                    
-                        # with vendor1:
-                        #     col_table, col_side = st.columns([3, 1])
-                        #     with col_table:
-                        #         rendersla(f"Vendor per {loccol}", finaltabel, height=900)
-                        #     with col_side:
-                        #         st.write("##")
-                        #         for v in vendorfeature[loccol].unique():
-                        #             with st.expander(str(v)):
-                        #                 subdf= vendorfeature[vendorfeature[loccol]==v]
-                        #                 for w, row in subdf.iterrows():st.write(f"{row['VendorName']} ({row['Amount']})")
                                         
-                        with vendor2:
-                            st.write("## Vendor Pivot")
+                        with vendor:
+                            st.write("## Vendor")
                             vendorpivot=(tergabung.merge(sladf[["WorkOrderNumber","VendorName"]].drop_duplicates(), on="WorkOrderNumber", how="left").groupby(["VendorName","slaoptions", "StatusReport"]).agg({"WorkOrderNumber": "nunique"}).reset_index())
                             vendorpivot= vendorpivot.pivot_table(index=["VendorName","slaoptions"], columns="StatusReport", values="WorkOrderNumber", aggfunc="sum", fill_value=0).reset_index()
                             urutanstatus=["OPEN","ONPROGRESS","POSTPONE","COMPLETE", "INTEGRATION FAILED", "APPROVAL DISPATCHER FS", "CANCEL"]
@@ -492,6 +531,23 @@ def render_slasum(df,exceldata):
                             finaldf.columns=barisheader
                             rendersla("SLA Summary per City", finaldf, height=800) 
                             
+                            addinfo_fromdf= df[["WorkOrderNumber", "ReferenceCode", "VendorName"]].drop_duplicates()
+                            tergabung_valid= pd.merge(tergabung_valid, addinfo_fromdf, on="WorkOrderNumber", how="left")
+                            for vendor in sorted(tergabung_valid["VendorName"].dropna().unique()):
+                                with st.expander(f"{vendor}"):
+                                    vendor_df= tergabung_valid[tergabung_valid["VendorName"]== vendor]
+                                    status_sum=(
+                                        vendor_df.groupby("StatusReport")["WorkOrderNumber"].nunique().reindex(["OPEN", "ONPROGRESS", "POSTPONE", "COMPLETE", "INTEGRATION FAILED", "APPROVAL DISPATCHER FS", "CANCEL"], fill_value=0).reset_index()
+                                    )
+                                    for m, row in status_sum.iterrows():
+                                        status= row["StatusReport"]
+                                        count= row["WorkOrderNumber"]
+                                        if count>0:
+                                            with st.expander(f"{status} ({count} WO)"):
+                                                filtered= vendor_df[vendor_df["StatusReport"]== status]
+                                                wo_info= filtered[[ "WorkOrderNumber","ReferenceCode", "City", "VendorName"]]
+                                                st.dataframe(wo_info, hide_index=True, width="stretch")
+                            
                             
         
 
@@ -500,6 +556,10 @@ def render_slasum(df,exceldata):
             
     else:
         st.warning ("ganemu historywo")
+        
+    
+
+        
         
     # dataframesla= tergabung_valid.copy()
     # if uploaded is not None:
