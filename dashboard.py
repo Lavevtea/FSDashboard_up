@@ -100,7 +100,7 @@ if uploaded is not None:
             render_statuschart(dfstat,exceldata)
 
         elif menu_sidebar == "SLA Summary":
-            render_slasum(df, exceldata, df_history)
+            render_slasum(df, exceldata)
              
         elif menu_sidebar == "Export SLA":
             exportsla(df, df_rca, df_history)
