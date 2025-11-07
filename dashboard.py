@@ -23,8 +23,11 @@ with open("header.html", "r") as head:
 
 
 
-uploaded=st.file_uploader("Upload Excel File", type=["xlsx", "csv"]) 
-
+uploaded = st.file_uploader("Upload Excel File", type=["xlsx", "csv"])
+if st.button("Refresh", use_container_width=True):
+    st.cache_data.clear()
+    st.rerun()
+        
 if uploaded is not None:
     up2webtime= pd.Timestamp.now()
     @st.cache_data

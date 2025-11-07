@@ -258,7 +258,6 @@ def render_slasum(df,exceldata):
                         # st.write(tergabung)
                         tergabung_valid= tergabung.dropna(subset=["slaoptions"]).copy()
                         # st.write(tergabung_valid)
-
                         
                         slagroup=( tergabung_valid.groupby([kol_area, "StatusReport", "slaoptions"]).agg({"WorkOrderNumber": "nunique"}).reset_index())
                                                                                                         
@@ -447,10 +446,10 @@ def render_slasum(df,exceldata):
                                                         sla_count = srow["WorkOrderNumber"]
                                                         with st.expander(f"{sla_label} ({sla_count} WO)"):
                                                             filtered_sla = filtered[filtered["slaoptions"] == sla_label]
-                                                            addinfo_fromdf = (df[["WorkOrderNumber","ReferenceCode","VendorName","CustomerName","Created"]].drop_duplicates())
+                                                            addinfo_fromdf = (df[["WorkOrderNumber","ReferenceCode","VendorName","CustomerName","EndCustomerName","Created"]].drop_duplicates())
                                                             wo_info = pd.merge(filtered_sla,addinfo_fromdf,on="WorkOrderNumber",how="left")
                                                             wo_info= wo_info.rename(columns={"status_c":"Modified"})
-                                                            wo_info = wo_info[["WorkOrderNumber", "ReferenceCode","City","VendorName","CustomerName", "Created", "Modified"]]
+                                                            wo_info = wo_info[["WorkOrderNumber", "ReferenceCode","City","VendorName","CustomerName","EndCustomerName", "Created", "Modified"]]
                                                             st.dataframe(wo_info, hide_index=True, width="stretch")
                                 
                         with subregion:
@@ -479,10 +478,10 @@ def render_slasum(df,exceldata):
                                                         sla_count = srow["WorkOrderNumber"]
                                                         with st.expander(f"{sla_label} ({sla_count} WO)"):
                                                             filtered_sla = filtered[filtered["slaoptions"] == sla_label]
-                                                            addinfo_fromdf = (df[["WorkOrderNumber","ReferenceCode","VendorName","CustomerName","Created"]].drop_duplicates())
+                                                            addinfo_fromdf = (df[["WorkOrderNumber","ReferenceCode","VendorName","CustomerName","EndCustomerName","Created"]].drop_duplicates())
                                                             wo_info = pd.merge(filtered_sla,addinfo_fromdf,on="WorkOrderNumber",how="left")
                                                             wo_info= wo_info.rename(columns={"status_c":"Modified"})
-                                                            wo_info = wo_info[["WorkOrderNumber", "ReferenceCode","City","VendorName", "CustomerName","Created", "Modified"]]
+                                                            wo_info = wo_info[["WorkOrderNumber", "ReferenceCode","City","VendorName", "CustomerName", "EndCustomerName", "Created", "Modified"]]
                                                             st.dataframe(wo_info, hide_index=True, width="stretch")
                         with city:
                             rendersla("SLA Summary per City", finaltabel_city, kol_area="City", height=500) 
@@ -510,10 +509,10 @@ def render_slasum(df,exceldata):
                                                         sla_count = srow["WorkOrderNumber"]
                                                         with st.expander(f"{sla_label} ({sla_count} WO)"):
                                                             filtered_sla = filtered[filtered["slaoptions"] == sla_label]
-                                                            addinfo_fromdf = (df[["WorkOrderNumber","ReferenceCode","VendorName","CustomerName","Created"]].drop_duplicates())
+                                                            addinfo_fromdf = (df[["WorkOrderNumber","ReferenceCode","VendorName","CustomerName","EndCustomerName","Created"]].drop_duplicates())
                                                             wo_info = pd.merge(filtered_sla,addinfo_fromdf,on="WorkOrderNumber",how="left")
                                                             wo_info= wo_info.rename(columns={"status_c":"Modified"})
-                                                            wo_info = wo_info[["WorkOrderNumber", "ReferenceCode","City","VendorName","CustomerName","Created", "Modified"]]
+                                                            wo_info = wo_info[["WorkOrderNumber", "ReferenceCode","City","VendorName","CustomerName","EndCustomerName","Created", "Modified"]]
                                                             st.dataframe(wo_info, hide_index=True, width="stretch")
                     
                                         
@@ -566,7 +565,7 @@ def render_slasum(df,exceldata):
                             
                             rendersla("SLA Summary per Vendor", finaldf, height=800) 
                                                  
-                            addinfo_fromdf= df[["WorkOrderNumber", "ReferenceCode", "CustomerName", "VendorName"]].drop_duplicates()
+                            addinfo_fromdf= df[["WorkOrderNumber", "ReferenceCode", "CustomerName", "EndCustomerName", "VendorName"]].drop_duplicates()
                             addinfo_fromdf["VendorName"] = addinfo_fromdf["VendorName"].fillna("No Vendor")
                             tergabung_valid= pd.merge(tergabung_valid, addinfo_fromdf, on="WorkOrderNumber", how="left")
                             tergabung_valid["VendorName"] = tergabung_valid["VendorName"].fillna("No Vendor")
@@ -593,15 +592,9 @@ def render_slasum(df,exceldata):
                                                         with st.expander(f"{sla_label} ({sla_count} WO)"):
                                                             filtered_sla = filtered[filtered["slaoptions"] == sla_label]
                                                             filtered_sla= filtered_sla.rename(columns={"open_c":"Created", "status_c":"Modified"})
-                                                            wo_info = filtered_sla[["WorkOrderNumber", "ReferenceCode","City","CustomerName","Created","Modified"]]
+                                                            wo_info = filtered_sla[["WorkOrderNumber", "ReferenceCode","City","CustomerName", "EndCustomerName","Created","Modified"]]
                                                             st.dataframe(wo_info, hide_index=True, width="stretch")
                            
-                                            
-                                                
-                                                
-                                                
-                            
-        
 
         else:
             st.warning("data kolomny galengkap di sheet historyworkorder")
@@ -613,105 +606,4 @@ def render_slasum(df,exceldata):
 
         
         
-    # dataframesla= tergabung_valid.copy()
-    # if uploaded is not None:
-    #     out, filename= exportfile(uploaded)
-    # st.caption("Click the button below to calculate the status duration, status SLA and export as Excel")  
-    # # exportbutton, fillerexpbutton1, fillerexpbutton2= st.columns([1, 2, 3])
-    # # with exportbutton:
-    # if st.button("Export to Excel", type="primary", use_container_width= True):
-
-    #     with st.spinner("Processing..."):
-            
-    #         if "finalcopy" in st.session_state:
-    #             final2= st.session_state.finalcopy.copy()
-    #             if{"WorkOrderNumber", "StatusReport"}.issubset(dataframesla.columns):
-    #                 temp_df= dataframesla[["WorkOrderNumber", "StatusReport", "duration"]].copy()
-    #                 temp_df= temp_df.rename(columns={"WorkOrderNumber":"WO Fieldsa"})
-    #                 final2= final2.merge(temp_df,  on=["WO Fieldsa", "StatusReport"], how="left")
-                    
-    #                 statusreportmap={
-    #                     "Open": "OPEN",
-    #                     "Assign To Technician": "ONPROGRESS",
-    #                     "Accept": "ONPROGRESS",
-    #                     "Travel": "ONPROGRESS",
-    #                     "Arrive": "ONPROGRESS",
-    #                     "On Progress": "ONPROGRESS",
-    #                     "Return": "ONPROGRESS",
-    #                     "Assign To Dispatch External": "ONPROGRESS",
-    #                     "Complete With Note Reject": "ONPROGRESS",
-    #                     "Revise": "ONPROGRESS",
-    #                     "Return By Technician": "ONPROGRESS",
-    #                     "Postpone Is Revised": "POSTPONE",
-    #                     "Return Is Revised": "ONPROGRESS",
-    #                     "Provisioning In Progress": "ONPROGRESS",
-    #                     "Provisioning Success": "ONPROGRESS",
-                        
-    #                     "Complete With Note Approve": "COMPLETE",
-    #                     "Complete": "COMPLETE",
-    #                     "Done": "COMPLETE",
-    #                     "Work Order Confirmation Approve": "COMPLETE",
-    #                     "Posted To Ax Integration Success": "COMPLETE",
-                        
-    #                     "Postpone": "POSTPONE",
-                        
-    #                     "Sms Integration Failed": "INTEGRATION FAILED",
-    #                     "Posted To Ax Integration Failed": "INTEGRATION FAILED",
-    #                     "Provisioning Failed": "INTEGRATION FAILED",
-                        
-    #                     "Complete With Note Request": "APPROVAL DISPATCHER FS",
-    #                     "Postpone Request": "APPROVAL DISPATCHER FS",
-                        
-    #                     "Cancel Work Order": "CANCEL"}
-                    
-    #                 def slaoptions_general(hour):
-    #                     if pd.isna(hour):
-    #                         return None
-    #                     if hour <= 4:
-    #                         return "0-4 Jam"
-    #                     elif hour <= 6:
-    #                         return "4-6 Jam"
-    #                     elif hour <= 12:
-    #                         return "6-12 Jam"
-    #                     else:
-    #                         return ">12 Jam"
-
-    #                 def slaoptions_broadband(hour):
-    #                     if pd.isna(hour):
-    #                         return None
-    #                     if hour <= 6:
-    #                         return "0-6 Jam"
-    #                     elif hour <= 12:
-    #                         return "6-12 Jam"
-    #                     elif hour <= 24:
-    #                         return "12-24 Jam"
-    #                     else:
-    #                         return ">24 Jam"
-                        
-    #                 def get_sla(row):
-    #                     div= str(row["DivisionName"])
-    #                     dur_sla= row["duration"]
-    #                     if "Broadband" in div:
-    #                         return slaoptions_broadband(dur_sla)
-    #                     elif "LMS" in div or "Fiberisasi" in div:
-    #                         return slaoptions_general(dur_sla)
-    #                     else:
-    #                         return None
-    #                 final2["SLA Summary"]= final2.apply(get_sla, axis=1)
-    #                 final2 = final2.drop(columns=["duration"])
-    #                 # st.write("liat")
-    #                 # st.dataframe(final2)
-                    
-    #                 buffer= BytesIO()
-    #                 with pd.ExcelWriter(buffer, engine="xlsxwriter") as writer:
-    #                     final2.to_excel(writer, index=False, sheet_name= "SLA")
-    #                     df_status= pd.DataFrame(list(statusreportmap.items()), columns=["Status", "Klasifikasi Status"])
-    #                     df_status.to_excel(writer, index=False, sheet_name= "KeteranganStatus")
-    #                 buffer.seek(0)
-    #                 nameformat = f"Dashboard_FIELDSA_{pd.Timestamp.now():%Y%m%d_%H%M%S}.xlsx"
-                    
-    #                 st.success("Export ready")
-    #                 st.download_button("Download Excel", data= buffer.getvalue(), file_name=nameformat, mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", use_container_width=True )
-    #             else:
-    #                 st.write("gabisa")
-        
+   
